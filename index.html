@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Hilih Generator</title>
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Tailwind (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Minimal tweaks to ensure good contrast & smooth fonts -->
+    <style>
+      ::selection { background: #bfdbfe; }
+      html, body { height: 100%; }
+    </style>
+  </head>
+  <body class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 antialiased">
+    <main class="min-h-screen flex items-center justify-center p-4">
+      <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <h1 class="text-3xl font-extrabold text-center text-gray-800 mb-2">hilihh</h1>
+        <p class="text-center text-base text-gray-700 mb-4">
+          
+        </p>
+        <label for="hilih-input" class="sr-only">Your text</label>
+        <textarea
+          id="hilih-input"
+          rows="4"
+          placeholder='Try: "helo kamu siapa namanya"'
+          class="border rounded-lg p-3 w-full text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600"
+        ></textarea>
+
+        <div class="mt-4">
+          <div class="flex items-center justify-between mb-1">
+            <p class="text-sm font-semibold text-gray-700">Result</p>
+            <button
+              id="copy-btn"
+              type="button"
+              class="text-sm px-3 py-1 rounded-lg bg-blue-600 text-white disabled:opacity-40 hover:bg-blue-700 transition"
+              disabled
+            >
+              Copy
+            </button>
+          </div>
+
+          <div
+            id="output"
+            class="border rounded-lg p-3 font-mono break-words min-h-[3rem] bg-gray-50 text-gray-900"
+          ></div>
+          <div id="copied-note" class="text-xs text-gray-500 mt-1 h-4">&nbsp;</div>
+        </div>
+
+        <p class="mt-6 text-center text-xs text-gray-500">
+          Made for the classic <code>alias hilih='sed s/[AUEOaueo]/i/g'</code> vibe.
+        </p>
+      </div>
+    </main>
+
+    <script>
+      // Core transform — mirrors: sed -e 's/[AUEOaueo]/i/g'
+      function hilih(text) {
+        return text.replace(/[AUEOaueo]/g, "i");
+      }
+
+      const input = document.getElementById("hilih-input");
+      const output = document.getElementById("output");
+      const copyBtn = document.getElementById("copy-btn");
+      const copiedNote = document.getElementById("copied-note");
+
+      function render() {
+        const value = input.value || "";
+        const result = hilih(value);
+        output.textContent = result;
+        copyBtn.disabled = result.length === 0;
+      }
+
+      input.addEventListener("input", render);
+
+      copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(output.textContent);
+          copiedNote.textContent = "Copied to clipboard ✅";
+          setTimeout(() => (copiedNote.textContent = "\u00A0"), 1200);
+        } catch {
+          copiedNote.textContent = "Copy failed. Select and copy manually.";
+          setTimeout(() => (copiedNote.textContent = "\u00A0"), 2000);
+        }
+      });
+
+      // Optional: prefill from URL ?q=...
+      (function prefillFromQuery() {
+        const params = new URLSearchParams(window.location.search);
+        const q = params.get("q");
+        if (q) input.value = q;
+      })();
+
+      // Autofocus and initial render
+      input.focus();
+      render();
+    </script>
+  </body>
+</html>
+
